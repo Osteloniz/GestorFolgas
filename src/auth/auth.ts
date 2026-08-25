@@ -5,14 +5,14 @@ import { twoFactor } from "better-auth/plugins";
 import { getDb } from "@/db/client";
 import * as schema from "@/db/schema";
 
+import { getTrustedOrigins } from "./trusted-origins";
+
 type AuthFactoryOptions = {
   allowSignUp?: boolean;
 };
 
 export function createAuth({ allowSignUp = false }: AuthFactoryOptions = {}) {
-  const trustedOrigins = [process.env.BETTER_AUTH_URL, process.env.NEXT_PUBLIC_APP_URL].filter(
-    (origin): origin is string => Boolean(origin),
-  );
+  const trustedOrigins = getTrustedOrigins();
 
   return betterAuth({
     appName: "Gestão de Compensações",
