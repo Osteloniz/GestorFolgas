@@ -48,7 +48,9 @@ A importação aceita arquivos `.xlsx` de até 5 MB e 2.000 linhas, com as colun
 
 ### E-mail transacional
 
-`RESEND_API_KEY` e `EMAIL_FROM` estão reservadas para a fase de notificações. Configurar essas variáveis, por si só, ainda não envia mensagens: o serviço de confirmação via Resend precisa ser integrado ao fluxo de submissão e ao histórico `EmailDelivery`.
+Após cada escolha pública persistida, a aplicação registra uma entrega e envia uma confirmação individual pelo Resend. A mensagem contém campanha, matrícula, nome, departamento, datas e horário do registro. Falhas do provedor são gravadas como `FAILED` e nunca desfazem a escolha de folgas.
+
+Configure `RESEND_API_KEY` e `EMAIL_FROM` no ambiente. Em produção, `EMAIL_FROM` deve usar um domínio próprio verificado no Resend; o domínio `resend.dev` serve apenas para testes limitados ao endereço proprietário da conta.
 
 ## Administrador inicial
 
