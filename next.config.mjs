@@ -41,7 +41,6 @@ if (process.platform === "win32") {
 
 const nextConfig = {
   reactStrictMode: true,
-  pageExtensions: ["next.ts", "next.tsx", "next.js", "next.jsx"],
   webpack(config) {
     config.resolve.symlinks = false;
     return config;
