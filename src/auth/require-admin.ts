@@ -19,7 +19,7 @@ export class UnauthorizedError extends Error {
 
 export async function requireAdmin() {
   const session = await auth.api.getSession({ headers: await headers() });
-  if (!session?.user?.id) throw new UnauthorizedError();
+  if (!session?.user?.id || session.user.twoFactorEnabled !== true) throw new UnauthorizedError();
 
   const [admin] = await getDb()
     .select({ id: adminUsers.id, email: adminUsers.email, name: adminUsers.name })

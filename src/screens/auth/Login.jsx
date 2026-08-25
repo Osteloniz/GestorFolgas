@@ -30,7 +30,7 @@ export default function Login() {
         return;
       }
 
-      window.location.assign("/admin");
+      window.location.assign(result.data?.user?.twoFactorEnabled === true ? "/admin" : "/configurar-mfa");
     } catch {
       setError("Não foi possível entrar agora. Tente novamente.");
     } finally {
