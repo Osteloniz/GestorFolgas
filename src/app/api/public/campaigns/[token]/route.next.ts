@@ -14,10 +14,12 @@ import {
   campaigns,
   campaignWeekdayRules,
   departments,
+  emailDeliveries,
   employees,
   leaveChoices,
   leaveSubmissions,
 } from "@/db/schema";
+import { deliverSubmissionConfirmation } from "@/server/email/submission-confirmation";
 
 const statusLabels = { DRAFT: "Rascunho", SCHEDULED: "Agendada", OPEN: "Aberta", CLOSED: "Encerrada", CANCELLED: "Cancelada" } as const;
 const weekdayKeys = ["domingo", "segunda", "terca", "quarta", "quinta", "sexta", "sabado"];
@@ -282,8 +284,36 @@ export async function POST(request: Request, context: { params: Promise<{ token:
         campaignId: loaded.row.id,
         employeeId: eligibility.employeeId,
       });
-      return submission;
+      const [delivery] = await tx.insert(emailDeliveries).values({
+        submissionId: submission.id,
+        recipient: eligibility.emailSnapshot,
+        type: "LEAVE_SUBMISSION_CONFIRMATION",
+        provider: "RESEND",
+      }).returning({ id: emailDeliveries.id });
+      return {
+        ...submission,
+        deliveryId: delivery.id,
+        recipient: eligibility.emailSnapshot,
+        registration: eligibility.registrationNumberSnapshot,
+        employeeName: eligibility.nameSnapshot,
+        departmentName: eligibility.departmentNameSnapshot,
+      };
     });
+    try {
+      await deliverSubmissionConfirmation({
+        deliveryId: result.deliveryId,
+        submissionId: result.id,
+        recipient: result.recipient,
+        campaignName: loaded.row.name,
+        registration: result.registration,
+        employeeName: result.employeeName,
+        departmentName: result.departmentName,
+        leaveDates: uniqueDates,
+        submittedAt: result.submittedAt,
+      });
+    } catch {
+      console.error("A submissão foi persistida, mas não foi possível atualizar o registro de entrega do e-mail.", { submissionId: result.id });
+    }
     return NextResponse.json({ submittedAt: result.submittedAt.toISOString() }, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) return NextResponse.json({ error: "Dados enviados são inválidos." }, { status: 400 });
