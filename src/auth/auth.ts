@@ -1,6 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { twoFactor } from "better-auth/plugins";
+import { admin as adminPlugin, twoFactor } from "better-auth/plugins";
 
 import { getDb } from "@/db/client";
 import * as schema from "@/db/schema";
@@ -9,9 +9,13 @@ import { getTrustedOrigins } from "./trusted-origins";
 
 type AuthFactoryOptions = {
   allowSignUp?: boolean;
+  skipTwoFactorVerificationOnEnable?: boolean;
 };
 
-export function createAuth({ allowSignUp = false }: AuthFactoryOptions = {}) {
+export function createAuth({
+  allowSignUp = false,
+  skipTwoFactorVerificationOnEnable = false,
+}: AuthFactoryOptions = {}) {
   const trustedOrigins = getTrustedOrigins();
 
   return betterAuth({
@@ -44,9 +48,10 @@ export function createAuth({ allowSignUp = false }: AuthFactoryOptions = {}) {
       },
     },
     plugins: [
+      adminPlugin(),
       twoFactor({
         issuer: "Gestão de Compensações",
-        skipVerificationOnEnable: true,
+        skipVerificationOnEnable: skipTwoFactorVerificationOnEnable,
       }),
     ],
   });

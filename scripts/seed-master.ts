@@ -26,7 +26,7 @@ const password = await readSecret("Senha inicial: ");
 if (password.length < 6) throw new Error("A senha deve ter pelo menos 6 caracteres.");
 
 const db = getDb();
-const seedAuth = createAuth({ allowSignUp: true });
+const seedAuth = createAuth({ allowSignUp: true, skipTwoFactorVerificationOnEnable: true });
 
 try {
   const existing = await db.select({ id: user.id }).from(user).where(eq(user.email, email)).limit(1);

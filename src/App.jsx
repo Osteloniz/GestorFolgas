@@ -32,6 +32,7 @@ function loadAdminData() {
 // Page imports
 import Login from '@/pages/auth/Login';
 import MfaVerification from '@/pages/auth/MfaVerification';
+import MfaEnrollment from '@/pages/auth/MfaEnrollment';
 import AdminLayout from '@/components/admin/AdminLayout';
 import Dashboard from '@/pages/admin/Dashboard';
 import Campaigns from '@/pages/admin/Campaigns';
@@ -59,26 +60,36 @@ function ProtectedRoute() {
   return <Outlet />;
 }
 
+function MfaRequiredRoute() {
+  const { data: session, isPending } = authClient.useSession();
+  if (isPending) return <div className="fixed inset-0 flex items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>;
+  if (!session) return <Navigate to="/login" replace />;
+  if (session.user.twoFactorEnabled !== true) return <Navigate to="/configurar-mfa" replace />;
+  return <Outlet />;
+}
+
 const AuthenticatedApp = () => {
   return (
     <Routes>
       {/* Public + auth routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/verificacao" element={<MfaVerification />} />
-      <Route path="/configurar-mfa" element={<Navigate to="/verificacao" replace />} />
       <Route path="/folga/:token" element={<PublicCampaign />} />
 
       {/* Admin autenticado */}
       <Route element={<ProtectedRoute />}>
-        <Route element={<AdminLayout />}>
-          <Route path="/admin" element={<Dashboard />} />
-          <Route path="/admin/campanhas" element={<Campaigns />} />
-          <Route path="/admin/campanhas/nova" element={<CampaignWizard />} />
-          <Route path="/admin/campanhas/:id" element={<CampaignDetail />} />
-          <Route path="/admin/colaboradores" element={<Employees />} />
-          <Route path="/admin/relatorios" element={<Reports />} />
-          <Route path="/admin/configuracoes" element={<Settings />} />
-          <Route path="/admin/minha-conta" element={<MyAccount />} />
+        <Route path="/configurar-mfa" element={<MfaEnrollment />} />
+        <Route element={<MfaRequiredRoute />}>
+          <Route element={<AdminLayout />}>
+            <Route path="/admin" element={<Dashboard />} />
+            <Route path="/admin/campanhas" element={<Campaigns />} />
+            <Route path="/admin/campanhas/nova" element={<CampaignWizard />} />
+            <Route path="/admin/campanhas/:id" element={<CampaignDetail />} />
+            <Route path="/admin/colaboradores" element={<Employees />} />
+            <Route path="/admin/relatorios" element={<Reports />} />
+            <Route path="/admin/configuracoes" element={<Settings />} />
+            <Route path="/admin/minha-conta" element={<MyAccount />} />
+          </Route>
         </Route>
       </Route>
 
