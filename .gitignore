@@ -32,3 +32,4 @@ dist-ssr
 
 .env
 .vite
+tsconfig.tsbuildinfo

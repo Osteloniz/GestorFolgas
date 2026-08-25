@@ -15,6 +15,13 @@
       "when": 1787669736344,
       "tag": "0001_little_mordo",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1787684298031,
+      "tag": "0002_opposite_marvel_boy",
+      "breakpoints": true
     }
   ]
 }

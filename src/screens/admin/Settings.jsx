@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import { toast } from "sonner";
 import {
   Settings as SettingsIcon, Building2, FileText, Mail, ShieldCheck, SlidersHorizontal,
-  Plus, Pencil, Power, KeyRound, Smartphone, RefreshCw, LogOut, Eye, EyeOff,
+  Plus, Pencil, Power,
 } from "lucide-react";
-import { SETTINGS, DEPARTMENTS, SESSIONS, RECOVERY_CODES } from "@/lib/databaseData";
+import { SETTINGS, DEPARTMENTS } from "@/lib/databaseData";
+import AdminUsersPanel from "@/components/admin/AdminUsersPanel";
 import { PageHeader, SectionCard } from "@/components/ui/common";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +20,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { requestJson } from "@/lib/api-client";
@@ -307,129 +308,20 @@ function EmailTab() {
 }
 
 function SecurityTab() {
-  const [pwOpen, setPwOpen] = useState(false);
-  const [codesOpen, setCodesOpen] = useState(false);
-  const [resetOpen, setResetOpen] = useState(false);
-  const [endSessionOpen, setEndSessionOpen] = useState(null);
-
   return (
     <div className="space-y-6">
-      <SectionCard title="Autenticação em dois fatores">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium">Status: Ativada</p>
-            <p className="text-sm text-muted-foreground">Método: Aplicativo autenticador</p>
-          </div>
-          <ShieldCheck className="h-8 w-8 text-emerald-600" />
-        </div>
-        <div className="mt-4 flex flex-wrap gap-2">
-          <Button variant="outline" size="sm" onClick={() => setCodesOpen(true)}><KeyRound className="mr-1.5 h-3.5 w-3.5" /> Mostrar códigos de recuperação</Button>
-          <Button variant="outline" size="sm" onClick={() => toast.success("Novos códigos gerados")}><RefreshCw className="mr-1.5 h-3.5 w-3.5" /> Gerar novos códigos</Button>
-          <Button variant="outline" size="sm" className="text-rose-600" onClick={() => setResetOpen(true)}><Smartphone className="mr-1.5 h-3.5 w-3.5" /> Redefinir autenticador</Button>
-        </div>
+      <SectionCard title="Controle de acesso" description="Somente administradores ativos e com autenticação em duas etapas podem usar o painel.">
+        <AdminUsersPanel />
       </SectionCard>
-
-      <SectionCard title="Senha" action={<Button variant="outline" size="sm" onClick={() => setPwOpen(true)}><KeyRound className="mr-1.5 h-3.5 w-3.5" /> Alterar senha</Button>}>
-        <p className="text-sm text-muted-foreground">Última alteração há 30 dias.</p>
+      <SectionCard title="Transferência segura de acesso">
+        <ol className="list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
+          <li>Crie a conta da nova pessoa e envie a senha temporária por um canal seguro.</li>
+          <li>Peça que ela entre e configure o próprio Google Authenticator.</li>
+          <li>Confirme nesta tela que o autenticador aparece como configurado.</li>
+          <li>Somente depois disso, desative o administrador anterior.</li>
+        </ol>
       </SectionCard>
-
-      <SectionCard title="Sessões ativas" action={<Button variant="outline" size="sm" onClick={() => toast.success("Outras sessões encerradas")}>Encerrar todas as outras</Button>}>
-        <div className="space-y-3">
-          {SESSIONS.map((s) => (
-            <div key={s.id} className="flex items-center justify-between rounded-lg border border-border p-3">
-              <div className="flex items-center gap-3">
-                <Smartphone className="h-5 w-5 text-slate-400" />
-                <div>
-                  <p className="text-sm font-medium">{s.device}</p>
-                  <p className="text-xs text-muted-foreground">{s.location} · {s.lastAccess}</p>
-                </div>
-              </div>
-              {s.current ? (
-                <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">Atual</span>
-              ) : (
-                <Button variant="ghost" size="sm" onClick={() => setEndSessionOpen(s)}><LogOut className="mr-1.5 h-3.5 w-3.5" /> Encerrar</Button>
-              )}
-            </div>
-          ))}
-        </div>
-      </SectionCard>
-
-      {pwOpen && <PasswordDialog onClose={() => setPwOpen(false)} />}
-      {codesOpen && <RecoveryCodesDialog onClose={() => setCodesOpen(false)} />}
-      <ConfirmationDialog
-        open={!!resetOpen}
-        onOpenChange={(o) => !o && setResetOpen(false)}
-        title="Redefinir autenticador"
-        description="Você precisará configurar a autenticação em duas etapas novamente no próximo acesso."
-        confirmLabel="Redefinir"
-        destructive
-        onConfirm={() => { setResetOpen(false); toast.success("Autenticador redefinido"); }}
-      />
-      <ConfirmationDialog
-        open={!!endSessionOpen}
-        onOpenChange={(o) => !o && setEndSessionOpen(null)}
-        title="Encerrar sessão"
-        description={`Encerrar a sessão ${endSessionOpen?.device}?`}
-        confirmLabel="Encerrar"
-        destructive
-        onConfirm={() => { setEndSessionOpen(null); toast.success("Sessão encerrada"); }}
-      />
     </div>
-  );
-}
-
-function PasswordDialog({ onClose }) {
-  const [show, setShow] = useState(false);
-  return (
-    <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader><DialogTitle>Alterar senha</DialogTitle></DialogHeader>
-        <div className="space-y-4">
-          {[
-            { label: "Senha atual", key: "current" },
-            { label: "Nova senha", key: "new" },
-            { label: "Confirmar nova senha", key: "confirm" },
-          ].map((f) => (
-            <Field key={f.key} label={f.label}>
-              <div className="relative">
-                <Input type={show ? "text" : "password"} placeholder="••••••••" />
-                <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" onClick={() => setShow((s) => !s)}>
-                  {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-            </Field>
-          ))}
-          <ul className="space-y-1 text-xs text-muted-foreground">
-            <li>• Mínimo de 8 caracteres</li>
-            <li>• Ao menos uma letra maiúscula e um número</li>
-            <li>• Ao menos um caractere especial</li>
-          </ul>
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancelar</Button>
-          <Button onClick={() => { onClose(); toast.success("Senha alterada"); }}>Salvar</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-function RecoveryCodesDialog({ onClose }) {
-  return (
-    <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Códigos de recuperação</DialogTitle>
-          <DialogDescription>Guarde estes códigos em local seguro.</DialogDescription>
-        </DialogHeader>
-        <div className="grid grid-cols-2 gap-2 rounded-lg border border-border bg-slate-50 p-4">
-          {RECOVERY_CODES.map((c) => <code key={c} className="font-mono text-sm">{c}</code>)}
-        </div>
-        <DialogFooter>
-          <Button onClick={onClose}>Fechar</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
   );
 }
 
