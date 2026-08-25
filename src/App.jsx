@@ -30,18 +30,18 @@ function loadAdminData() {
 }
 
 // Page imports
-import Login from '@/pages/auth/Login';
-import MfaVerification from '@/pages/auth/MfaVerification';
+import Login from '@/screens/auth/Login';
+import MfaVerification from '@/screens/auth/MfaVerification';
 import AdminLayout from '@/components/admin/AdminLayout';
-import Dashboard from '@/pages/admin/Dashboard';
-import Campaigns from '@/pages/admin/Campaigns';
-import CampaignDetail from '@/pages/admin/CampaignDetail';
-import CampaignWizard from '@/pages/admin/CampaignWizard';
-import Employees from '@/pages/admin/Employees';
-import Reports from '@/pages/admin/Reports';
-import Settings from '@/pages/admin/Settings';
-import MyAccount from '@/pages/admin/MyAccount';
-import PublicCampaign from '@/pages/public/PublicCampaign';
+import Dashboard from '@/screens/admin/Dashboard';
+import Campaigns from '@/screens/admin/Campaigns';
+import CampaignDetail from '@/screens/admin/CampaignDetail';
+import CampaignWizard from '@/screens/admin/CampaignWizard';
+import Employees from '@/screens/admin/Employees';
+import Reports from '@/screens/admin/Reports';
+import Settings from '@/screens/admin/Settings';
+import MyAccount from '@/screens/admin/MyAccount';
+import PublicCampaign from '@/screens/public/PublicCampaign';
 
 function ProtectedRoute() {
   const { data: session, isPending } = authClient.useSession();

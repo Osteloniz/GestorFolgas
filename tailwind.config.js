@@ -8,7 +8,7 @@ module.exports = {
       "./src/features/**/*.{ts,tsx,js,jsx}",
       "./src/hooks/**/*.{ts,tsx,js,jsx}",
       "./src/lib/**/*.{ts,tsx,js,jsx}",
-      "./src/pages/**/*.{ts,tsx,js,jsx}",
+      "./src/screens/**/*.{ts,tsx,js,jsx}",
     ],
   theme: {
   	extend: {
