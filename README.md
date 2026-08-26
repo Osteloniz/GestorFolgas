@@ -62,17 +62,19 @@ npm run auth:seed-master -- admin@exemplo.com "Nome do administrador"
 
 A senha é solicitada em prompt oculto. O QR TOTP e os recovery codes são gravados em `.secrets/`, que é ignorada pelo Git. Remova esses arquivos depois de cadastrá-los e armazená-los em local seguro.
 
-## Cadastrar ou transferir o acesso administrativo
+## Cadastrar novos administradores
 
 Depois do primeiro administrador, as demais contas devem ser criadas visualmente em **Configurações → Segurança → Novo administrador**. Não execute novamente o seed para essa finalidade.
 
-Fluxo recomendado para passar a administração a outra pessoa:
+Fluxo recomendado para adicionar uma pessoa à administração:
 
 1. Crie o novo administrador com nome, e-mail e uma senha temporária forte.
 2. Compartilhe a senha temporária por um canal seguro e separado do e-mail de acesso.
 3. No primeiro login, a nova pessoa será obrigada a trocar a senha, configurar o próprio Google Authenticator e salvar os códigos de recuperação.
 4. Confira em **Configurações → Segurança** se a conta está ativa e aparece como **Autenticador configurado**.
-5. Peça que a pessoa teste um novo login. Só então desative a conta anterior. O sistema impede desativar a própria conta e o último administrador ativo.
+5. Peça que a pessoa teste um novo login. As contas administrativas necessárias podem permanecer ativas simultaneamente.
+
+A desativação é opcional e deve ser usada somente quando for necessário revogar um acesso. O sistema impede desativar a própria conta e o último administrador ativo.
 
 O QR Code e os códigos de recuperação nunca são enviados ao administrador que criou a conta. Eles são exibidos somente ao novo titular durante a configuração.
 

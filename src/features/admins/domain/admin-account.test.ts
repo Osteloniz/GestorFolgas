@@ -27,4 +27,13 @@ describe("admin account", () => {
       targetAdminId: "a2", currentAdminId: "a1", nextActive: false, activeAdminCount: 1,
     })).toContain("ao menos um");
   });
+
+  it("permite manter vários administradores ativos simultaneamente", () => {
+    expect(getAdminStatusChangeError({
+      targetAdminId: "a2", currentAdminId: "a1", nextActive: true, activeAdminCount: 2,
+    })).toBeNull();
+    expect(getAdminStatusChangeError({
+      targetAdminId: "a2", currentAdminId: "a1", nextActive: false, activeAdminCount: 2,
+    })).toBeNull();
+  });
 });

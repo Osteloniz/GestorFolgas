@@ -313,12 +313,12 @@ function SecurityTab() {
       <SectionCard title="Controle de acesso" description="Somente administradores ativos e com autenticação em duas etapas podem usar o painel.">
         <AdminUsersPanel />
       </SectionCard>
-      <SectionCard title="Transferência segura de acesso">
+      <SectionCard title="Boas práticas para novos administradores">
         <ol className="list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
           <li>Crie a conta da nova pessoa e envie a senha temporária por um canal seguro.</li>
           <li>Peça que ela entre e configure o próprio Google Authenticator.</li>
           <li>Confirme nesta tela que o autenticador aparece como configurado.</li>
-          <li>Somente depois disso, desative o administrador anterior.</li>
+          <li>Mantenha as contas necessárias ativas. Desative um administrador somente quando precisar revogar o acesso.</li>
         </ol>
       </SectionCard>
     </div>
